@@ -1,3 +1,5 @@
+import 'package:appvictus/AddLibraryPage.dart';
+import 'package:appvictus/ProfilePage.dart';
 import 'package:appvictus/colors/ColorPalete.dart';
 import 'package:appvictus/LibraryPage.dart';
 import 'package:appvictus/model/CarouselModel.dart';
@@ -33,7 +35,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(currentPosition == 0? "Olá ${widget.name}" : "Biblioteca",style: TextStyle(fontWeight: FontWeight.bold),),
+        title: Text(currentPosition == 0? "Olá ${widget.name}" : currentPosition==1? "Biblioteca" : "Perfil",style: TextStyle(fontWeight: FontWeight.bold),),
         actions: [
           IconButton(onPressed: (){}, icon: Icon(Icons.group)),
           IconButton(onPressed: (){}, icon: Icon(Icons.add_alert)),
@@ -45,6 +47,8 @@ class _HomePageState extends State<HomePage> {
               setState(() {
                 currentPosition = 0;
               });
+            }else if(currentPosition==0){
+              Navigator.pop(context);
             }
           },
           child: Icon(Icons.arrow_back),
@@ -134,7 +138,7 @@ class _HomePageState extends State<HomePage> {
               ),
 
 
-             widget.dailyMessage.isNotEmpty && widget.dailyMessage.contains("|") ?  Container(
+            widget.dailyMessage.replaceAll("|", "").contains("|") ?  Container(
                 padding: EdgeInsets.only(top: 1.h,bottom: 3.h),
                 margin: EdgeInsets.only(bottom: 2.h, top: 2.h),
                 decoration: BoxDecoration(
@@ -173,6 +177,7 @@ class _HomePageState extends State<HomePage> {
                  widget.calorias!=0? Container(
                       width: 44.w,
                       height: 150,
+                      margin: EdgeInsets.only(top: 10),
                       decoration: BoxDecoration(
                           color: ColorPalete.defaultColor.withOpacity(.2),
                           borderRadius: BorderRadius.circular(15)
@@ -194,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         progressBorderColor: Colors.white ,
                       )) : Container(),
-                  Container(
+                widget.events.isEmpty? Container():  Container(
                     width: 44.w,
                     height: 150,
                     decoration: BoxDecoration(
@@ -246,7 +251,7 @@ class _HomePageState extends State<HomePage> {
 
                                       ),
                                       margin: EdgeInsets.only(bottom: 10),
-                                      child: Text("+ 1 evento",style: TextStyle(fontSize: 15),),
+                                      child: Text("+ ${widget.events.length-2} evento",style: TextStyle(fontSize: 15),),
                                     );
                                   }
 
@@ -262,7 +267,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           )
-      ) : LibraryPage(widget.userID),
+      ) : currentPosition==1? LibraryPage(widget.userID) : ProfilePage(widget.userID),
+      floatingActionButton: currentPosition==1 ? FloatingActionButton(onPressed: (){
+        Navigator.push(context, MaterialPageRoute(builder: (_) => AddLibraryPage()));
+      }, child: Icon(Icons.add),foregroundColor: Colors.white,backgroundColor: ColorPalete.defaultColor,) : null,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         selectedItemColor: ColorPalete.defaultColor,
@@ -275,6 +283,7 @@ class _HomePageState extends State<HomePage> {
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
             BottomNavigationBarItem(icon: Icon(Icons.my_library_music,), label: "Biblioteca"),
+            BottomNavigationBarItem(icon: Icon(Icons.account_circle,), label: "Perfil"),
       ]),
     );
   }

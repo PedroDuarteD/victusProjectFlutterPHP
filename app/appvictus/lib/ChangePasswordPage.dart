@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
-
 import 'colors/ColorPalete.dart';
 import 'homePage.dart';
 import 'http/constants.dart';
@@ -178,14 +176,21 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
                       if(_editEmail.text.isNotEmpty &&_editConfirmPassword.text.isNotEmpty && _editPassword.text.isNotEmpty && _editPassword.text == _editConfirmPassword.text){
 
-                        var request = await http.get(Uri.parse(HttpConstants.url+"resetPassword.php?email=${_editEmail.text}&pass=${_editPassword.text}&Confirmpass=${_editConfirmPassword.text}"),
+                        var request = await http.put(Uri.parse(HttpConstants.url+"resetPassword.php"),
                             headers: {
-                              "Content-type": "application/json", "Accept": "application/json"
-                            });
+                              "Content-type": "application/json",
+                              "Accept": "application/json",
+                              "Authorization": "Bearer ${HttpConstants.Token}",
 
+                            }, body: jsonEncode({
+                              "email"  : _editEmail.text,
+                              "pass" :  _editPassword.text,
+                              "Confirmpass" : _editConfirmPassword.text
+                            }));
+                        print("all decode: "+request.body.toString());
                         var convert = jsonDecode(request.body);
 
-                        print("all decode: "+convert.toString());
+
 
                         if(convert["res"]=="success"){
 

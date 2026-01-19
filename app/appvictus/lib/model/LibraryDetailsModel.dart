@@ -3,18 +3,18 @@ import 'package:appvictus/model/LibrarySectionModel.dart';
 
 class LibraryDetailsModel extends LibraryModel{
 
-  int idStar = -1, idLike = -1, idDone = -1;
-  String urlVideo= "";
+  int idStar = -1, idLike = -1, idDone = -1, idLibraryUser = -1, currentIndexPlayer = -1;
 
   List<LibrarySectionModel> sections = [];
 
 
-  LibraryDetailsModel(super.id, super.url, super.title, super.desc, super.percent, bool star, int idStar, bool like, int idLike, bool done, int idDone, List<LibrarySectionModel> sec, String videourl){
+  LibraryDetailsModel(super.id, super.url, super.title, super.desc, super.percent, bool star, int idStar, bool like, int idLike, bool done, int idDone, List<LibrarySectionModel> sec, int idLibraryUser, int currentIndexPlayer){
     this.sections = sec;
     this.idDone = idDone;
     this.idLike = idLike;
     this.idStar = idStar;
-    this.urlVideo = videourl;
+    this.idLibraryUser = idLibraryUser;
+    this.currentIndexPlayer = currentIndexPlayer;
   }
 
 
@@ -39,7 +39,8 @@ class LibraryDetailsModel extends LibraryModel{
         json["done"] ?? false,
       json["idRowDone"] ?? -1,
       sections,
-      json["videoURL"] ?? ""
+      json["idLibraryUser"] ?? -1,
+      json["currentIndexPlayer"] ?? -1,
     );
   }
 

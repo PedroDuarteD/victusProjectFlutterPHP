@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 16, 2026 at 05:44 AM
+-- Generation Time: Jan 19, 2026 at 01:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -71,22 +71,18 @@ INSERT INTO `dailymessage` (`id`, `myuser`, `title`, `description`) VALUES
 
 CREATE TABLE `library` (
   `id` int(11) NOT NULL,
-  `myuser` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `video` varchar(255) NOT NULL,
-  `progress` int(11) NOT NULL
+  `url` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `library`
 --
 
-INSERT INTO `library` (`id`, `myuser`, `title`, `description`, `url`, `video`, `progress`) VALUES
-(1, 5, 'My fake libro', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', 'https://thebackstage-deezer.com/wp-content/uploads/2023/11/musica-eletronica-1240x600.jpg', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4', 10),
-(2, 5, 'outro', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', 'https://thebackstage-deezer.com/wp-content/uploads/2023/11/musica-eletronica-1240x600.jpg', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4', 0),
-(3, 5, 'Diferente', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed', 'https://turismodocentro.pt/wp-content/uploads/2021/08/TC2020_PC_200708-9210-00299.jpg', '', 35);
+INSERT INTO `library` (`id`, `title`, `description`, `url`) VALUES
+(1, 'Projeto 1', 'loreum ip', 'https://thebackstage-deezer.com/wp-content/uploads/2023/11/musica-eletronica-1240x600.jpg'),
+(2, 'Projecto 2', 'Description', 'https://thebackstage-deezer.com/wp-content/uploads/2023/11/musica-eletronica-1240x600.jpg');
 
 -- --------------------------------------------------------
 
@@ -121,15 +117,43 @@ INSERT INTO `librarysection` (`id`, `idlibrary`, `title`) VALUES
 CREATE TABLE `librarysection_conteudo` (
   `id` int(11) NOT NULL,
   `idlibrarysection` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL
+  `title` varchar(255) NOT NULL,
+  `video` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `librarysection_conteudo`
 --
 
-INSERT INTO `librarysection_conteudo` (`id`, `idlibrarysection`, `title`) VALUES
-(1, 1, 'Metodos e os seus Principios !');
+INSERT INTO `librarysection_conteudo` (`id`, `idlibrarysection`, `title`, `video`) VALUES
+(1, 1, 'Metodos e os seus Principios !', 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
+(2, 1, 'titulo 2', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+(3, 2, 'Terceiro titulo', 'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
+(4, 1, 'Quarta secão agora', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+(5, 2, 'Texto exemplo 1', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+(6, 4, 'Texto exemplo 2', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+(7, 4, 'Nao podes ver este link', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+(8, 3, 'apenas um', 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `libraryuser`
+--
+
+CREATE TABLE `libraryuser` (
+  `id` int(11) NOT NULL,
+  `iduser` int(11) NOT NULL,
+  `idlibrary` int(11) NOT NULL,
+  `idlibseccontent` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `libraryuser`
+--
+
+INSERT INTO `libraryuser` (`id`, `iduser`, `idlibrary`, `idlibseccontent`) VALUES
+(1, 2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -145,6 +169,13 @@ CREATE TABLE `libraryuseractions` (
   `star` int(11) DEFAULT NULL,
   `done` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `libraryuseractions`
+--
+
+INSERT INTO `libraryuseractions` (`id`, `mylibrary`, `myuser`, `gosto`, `star`, `done`) VALUES
+(34, 1, 5, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -164,9 +195,9 @@ CREATE TABLE `myevents` (
 --
 
 INSERT INTO `myevents` (`id`, `myuser`, `title`, `inicio`) VALUES
-(1, 5, 'Masterclass', '23/05'),
-(2, 5, 'New Workshop', '12/08'),
-(3, 5, 'Pedro new job', '19/01');
+(1, 2, 'Masterclass', '23/05'),
+(2, 2, 'New Workshop', '12/08'),
+(3, 2, 'Pedro new job', '19/01');
 
 -- --------------------------------------------------------
 
@@ -179,7 +210,7 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `pass` varchar(255) NOT NULL,
-  `peso` int(255) NOT NULL
+  `peso` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -187,8 +218,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `pass`, `peso`) VALUES
-(5, 'Pedro', 'pedrootrabalhador@gmail.com', '1234', 5),
-(10, 'Victus', 'victus@gmail.com', '12345', 1);
+(2, 'Victus', 'victus@gmail.com', '$2y$13$6ADGVvTtiLcb0v3WDVFKGOBSbGA2dc9HIdGNch2ZvCC2GgdjBVKoO', 0),
+(3, 'pedro', 'pedro2@gmail.com', '$2y$13$Su/QcBBpuTvnD99vX2DWfOO7Z3iUESZyC7TZRIgrvi0K7YxZk6iTu', 0),
+(5, 'newAccount', 'email@gmail.com', '$2y$13$6PXmWM8qMMR9juA8xiI1yeR3aiwdRexnvT4PYJOAjx3YD1Ck2mNOS', 0);
 
 --
 -- Indexes for dumped tables
@@ -211,8 +243,7 @@ ALTER TABLE `dailymessage`
 -- Indexes for table `library`
 --
 ALTER TABLE `library`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `myuser` (`myuser`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `librarysection`
@@ -227,6 +258,15 @@ ALTER TABLE `librarysection`
 ALTER TABLE `librarysection_conteudo`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idlibrarysection` (`idlibrarysection`);
+
+--
+-- Indexes for table `libraryuser`
+--
+ALTER TABLE `libraryuser`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `iduser` (`iduser`),
+  ADD KEY `idlibrary` (`idlibrary`),
+  ADD KEY `idlibseccontent` (`idlibseccontent`);
 
 --
 -- Indexes for table `libraryuseractions`
@@ -269,7 +309,7 @@ ALTER TABLE `dailymessage`
 -- AUTO_INCREMENT for table `library`
 --
 ALTER TABLE `library`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `librarysection`
@@ -281,13 +321,19 @@ ALTER TABLE `librarysection`
 -- AUTO_INCREMENT for table `librarysection_conteudo`
 --
 ALTER TABLE `librarysection_conteudo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `libraryuser`
+--
+ALTER TABLE `libraryuser`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `libraryuseractions`
 --
 ALTER TABLE `libraryuseractions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `myevents`
@@ -299,7 +345,7 @@ ALTER TABLE `myevents`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -312,12 +358,6 @@ ALTER TABLE `dailymessage`
   ADD CONSTRAINT `dailymessage_ibfk_1` FOREIGN KEY (`myuser`) REFERENCES `users` (`id`);
 
 --
--- Constraints for table `library`
---
-ALTER TABLE `library`
-  ADD CONSTRAINT `library_ibfk_1` FOREIGN KEY (`myuser`) REFERENCES `users` (`id`);
-
---
 -- Constraints for table `librarysection`
 --
 ALTER TABLE `librarysection`
@@ -328,6 +368,14 @@ ALTER TABLE `librarysection`
 --
 ALTER TABLE `librarysection_conteudo`
   ADD CONSTRAINT `librarysection_conteudo_ibfk_1` FOREIGN KEY (`idlibrarysection`) REFERENCES `librarysection` (`id`);
+
+--
+-- Constraints for table `libraryuser`
+--
+ALTER TABLE `libraryuser`
+  ADD CONSTRAINT `libraryuser_ibfk_1` FOREIGN KEY (`iduser`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `libraryuser_ibfk_2` FOREIGN KEY (`idlibrary`) REFERENCES `library` (`id`),
+  ADD CONSTRAINT `libraryuser_ibfk_3` FOREIGN KEY (`idlibseccontent`) REFERENCES `librarysection_conteudo` (`id`);
 
 --
 -- Constraints for table `libraryuseractions`

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
-
 import 'colors/ColorPalete.dart';
 import 'homePage.dart';
 import 'http/constants.dart';
@@ -71,7 +67,7 @@ class _NewAccountPageState extends State<NewAccountPage> {
           ),
         ),
         child: Container(
-          margin: EdgeInsets.only(right: 5.w,left: 5.w),
+          margin: EdgeInsets.only(right: 5.w,left: 5.w, top: 15.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -208,7 +204,8 @@ class _NewAccountPageState extends State<NewAccountPage> {
                         var request = await http.post(Uri.parse(HttpConstants.url+"insertUser.php"),
                             headers: {
                               'Content-type': 'application/json',
-                              'Accept': 'application/json'
+                              'Accept': 'application/json',
+                              "Authorization": "Bearer ${HttpConstants.Token}",
                             },
                         body: json.encode({
                           "edit_name" : _editName.text,
@@ -258,27 +255,22 @@ class _NewAccountPageState extends State<NewAccountPage> {
 
 
 
-                    }, child: Text("Entrar",style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),),
+                    }, child: Text("Entrar",style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
                   )),
 
 
               Container(
                 width: 90.w,
-                margin: EdgeInsets.only(top: 18.h),
+                margin: EdgeInsets.only(top: 10.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Ao utilizares a Victus, aceitas os nossos"),
                     Text("Termos e Política de Privacidade", style: TextStyle(fontWeight: FontWeight.bold),)
-
                   ],
                 ),
               )
-
-
-
-
             ],
           ),
         ),

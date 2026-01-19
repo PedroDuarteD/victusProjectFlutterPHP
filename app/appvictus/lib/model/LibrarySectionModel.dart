@@ -1,10 +1,11 @@
 import 'package:appvictus/model/LibrarySectionContentModel.dart';
 
 class LibrarySectionModel {
+  int idSection = -1;
   String title = "";
   List<LibrarySectionContentModel> contents = [];
 
-  LibrarySectionModel(this.title, this.contents);
+  LibrarySectionModel(this.idSection,this.title,this.contents);
 
 
   factory LibrarySectionModel.FromJson(Map<String, dynamic> json){
@@ -14,7 +15,8 @@ class LibrarySectionModel {
       content.add(LibrarySectionContentModel.FromJson(item));
     }
     return LibrarySectionModel(
-      json["title"] ?? "",
+        json["idSection"] ?? 0,
+        json["title"] ?? "",
       content
     );
   }

@@ -8,3 +8,9 @@ pass: 12345
 Config do php
 user: root
 pass:
+
+install composer
+
+- composer require firebase/php-jwt
+
+- composer require vlucas/phpdotenv

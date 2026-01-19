@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:appvictus/SelectedLibraryPage.dart';
 import 'package:appvictus/colors/ColorPalete.dart';
 import 'package:appvictus/http/constants.dart';
@@ -16,18 +15,21 @@ class LibraryPage extends StatelessWidget {
 
   LibraryPage(this.ClientID);
 
-
   Future<List<LibraryModel>> getLibraryUseCase()async{
     List<LibraryModel> myLibrary = [];
 
     var request = await http.get(Uri.parse(HttpConstants.url+"getLibrary.php?id=${ClientID}"),
     headers: {
-      "Content-type": "application/json", "Accept": "application/json"
+      "Content-type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer ${HttpConstants.Token}",
     });
+
+    print("res: "+request.body.toString());
 
     var convert = jsonDecode(request.body);
 
-    for(var item in convert["library"]){
+    for(var item in convert["library"] ?? []){
       myLibrary.add(LibraryModel.FromJson(item));
     }
     
@@ -35,8 +37,6 @@ class LibraryPage extends StatelessWidget {
     return myLibrary;
     
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -47,19 +47,26 @@ class LibraryPage extends StatelessWidget {
           future: getLibraryUseCase(),
           builder: (_, snapshot){
         if(snapshot.connectionState==ConnectionState.done || snapshot.connectionState == ConnectionState.active){
+
+        if(snapshot.requireData.isEmpty){
+          return Center(
+            child: Text("Adiciona uma biblioteca", style: TextStyle(fontSize: 18),),
+          );
+        }else{
           return ListView.builder(
             itemBuilder: (_, position){
               return  GestureDetector(
-                onTap: (){
-                 LibraryModel model =  snapshot.requireData.elementAt(position);
+                  onTap: (){
+                    LibraryModel model =  snapshot.requireData.elementAt(position);
                     Navigator.push(context, MaterialPageRoute(builder: (_) => SelectedLibraryPage(model.title, model.desc, model.percent,model.id, this.ClientID)));
                   },
-                child: _renderCardLibrary(snapshot.requireData.elementAt(position)));
+                  child: _renderCardLibrary(snapshot.requireData.elementAt(position)));
             },
             itemCount: snapshot.requireData.length,
             shrinkWrap: true,
             padding: EdgeInsets.only(right: 5.w, left: 5.w),
           );
+        }
         }else{
           return Center(
             child: CircularProgressIndicator(),
@@ -101,7 +108,7 @@ class LibraryPage extends StatelessWidget {
              model.percent==0? SizedBox(
                 width: 43.w,
                  height: 50,
-                 child: Text(model.desc.substring(0,75), style: TextStyle(fontWeight: FontWeight.w400,fontSize: 10),)) :Row(
+                 child: Text(model.desc.length>75?model.desc.substring(0,75) : model.desc, style: TextStyle(fontWeight: FontWeight.w400,fontSize: 10),)) :Row(
                children: [
                  SizedBox(
                    width: 30.w,

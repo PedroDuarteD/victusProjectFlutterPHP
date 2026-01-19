@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:appvictus/ChangePasswordPage.dart';
 import 'package:appvictus/NewUserPage.dart';
 import 'package:appvictus/colors/ColorPalete.dart';
-import 'package:appvictus/SelectedLibraryPage.dart';
 import 'package:appvictus/homePage.dart';
 import 'package:appvictus/http/constants.dart';
 import 'package:appvictus/model/CarouselModel.dart';
@@ -11,16 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
 
-import 'LibraryPage.dart';
-
 void main() {
   return runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Sizer(
@@ -28,24 +23,9 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData(
-            // This is the theme of your application.
-            //
-            // TRY THIS: Try running your application with "flutter run". You'll see
-            // the application has a purple toolbar. Then, without quitting the app,
-            // try changing the seedColor in the colorScheme below to Colors.green
-            // and then invoke "hot reload" (save your changes or press the "hot
-            // reload" button in a Flutter-supported IDE, or press "r" if you used
-            // the command line to start the app).
-            //
-            // Notice that the counter didn't reset back to zero; the application
-            // state is not lost during the reload. To reset the state, use hot
-            // restart instead.
-            //
-            // This works for code too, not just values: Most code changes can be
-            // tested with just a hot reload.
             colorScheme: .fromSeed(seedColor: Colors.deepPurple),
           ),
-          home: MyHomePage(title: 'Flutter Demo Home Page'),
+          home: MyHomePage(),
         );
       }
     );
@@ -53,19 +33,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -77,6 +44,38 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController _editPassword = new TextEditingController();
 
   bool showPassword = true;
+
+
+  Future generateToken()async{
+
+    var request = await http.get(Uri.parse(HttpConstants.url+"createToken.php"),
+    headers: {
+      "email" : "pedro@gmail.com",
+      "pass" : "sdf2zeroe###2FF"
+    });
+
+    var convert = jsonDecode(request.body);
+
+    print("data response: "+convert.toString());
+
+    if(convert["res"]=="success"){
+      print("meu token: -"+convert["token"]+"-");
+      HttpConstants.Token = convert["token"];
+
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Servidor offline !")));
+    }
+
+  }
+
+
+  @override
+  void initState(){
+    generateToken();
+    super.initState();
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -193,44 +192,57 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   onPressed: ()async{
 
+                    if(_editEmail.text.isNotEmpty && _editPassword.text.isNotEmpty){
+                      var request = await http.post(Uri.parse(HttpConstants.url+"login.php"),
+                          headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "Authorization": "Bearer ${HttpConstants.Token}",
+                        },
+                          body: jsonEncode({
+                            "email" : _editEmail.text,
+                            "pass" : _editPassword.text
+                          }));
+
+                      print("res: "+request.body.toString());
+
+                      var convert = jsonDecode(request.body);
+
+                      if(convert["res"]=="success"){
+
+                        List<CarouselModel> listCarousel = [];
+                        for(var item in convert["buildapp"]["carousel"]){
+                          listCarousel.add(CarouselModel.FromJson(item));
+                        }
 
 
-                    var request = await http.get(Uri.parse(HttpConstants.url+"login.php?email=${_editEmail.text}&pass=${_editPassword.text}"),
-                    headers: {
-                      "Content-type": "application/json", "Accept": "application/json"
-                    });
+                        List<EventModel> listEvents = [];
+                        for(var item in convert["buildapp"]["events"]){
+                          listEvents.add(EventModel.FromJson(item));
+                        }
 
-                    print("all data: "+request.body);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage(
+                            convert["name"],
+                            convert["id"],
+                            convert["peso"],
+                            listCarousel,
+                            convert["buildapp"]["daily"]["title"]+"|"+convert["buildapp"]["daily"]["description"],
+                            listEvents
+                        )));
 
-                    var convert = jsonDecode(request.body);
+                      }else{
 
-                    if(convert["res"]=="success"){
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(convert["sms"])));
 
-                      List<CarouselModel> listCarousel = [];
-                      for(var item in convert["buildapp"]["carousel"]){
-                        listCarousel.add(CarouselModel.FromJson(item));
                       }
-
-
-                      List<EventModel> listEvents = [];
-                      for(var item in convert["buildapp"]["events"]){
-                        listEvents.add(EventModel.FromJson(item));
-                      }
-
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage(
-                          convert["name"],
-                          convert["id"],
-                          convert["peso"],
-                          listCarousel,
-                          convert["buildapp"]["daily"]["title"]+"|"+convert["buildapp"]["daily"]["description"],
-                          listEvents
-                      )));
-
                     }else{
-
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(convert["sms"])));
-
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Precisas de preencher tudo !")));
                     }
+
+
+
+
+
 
 
                 }, child: Text("Entrar",style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),),
@@ -282,10 +294,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               )
-
-
-
-
             ],
           ),
         ),
