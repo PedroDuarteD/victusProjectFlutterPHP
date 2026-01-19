@@ -25,9 +25,11 @@ class _SelectedLibraryPageState extends State<SelectedLibraryPage> {
 
   bool checkFavorite  = false, checkStar = false, checkDone = false;
   int idFavorite = -1, idStar = -1, idDone= -1;
-  int currentIndexSection = -1,  currentIndexPlayer   = 0, currentSectionIndexOpen = 0;
+  int currentIndexSection = -1,  currentIndexPlayer   = 0;
 
   String urlCurrentPlayer ="";
+
+  ValueNotifier notifySectionOpen = ValueNotifier(-1);
 
   late Future<LibraryDetailsModel> getSelectedLibrary;
 
@@ -172,7 +174,7 @@ class _SelectedLibraryPageState extends State<SelectedLibraryPage> {
                           );
                         }
                       },
-                    )//  Chewie(controller: chewieController,)
+                    )
                         :
                     Center(child: Text("Sem vídeo",style: TextStyle(color: Colors.white),),),
                 ),
@@ -486,125 +488,124 @@ class _SelectedLibraryPageState extends State<SelectedLibraryPage> {
                       SizedBox(
                         width: 90.w,
                         height: 300,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.requireData.sections.length,
-                          itemBuilder: (_, position){
+                        child: ValueListenableBuilder(
+                          valueListenable: notifySectionOpen,
+                          builder: (context, value, other) {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.requireData.sections.length,
+                              itemBuilder: (_, position){
 
-                            LibrarySectionModel model = snapshot.requireData.sections.elementAt(position);
+                                LibrarySectionModel model = snapshot.requireData.sections.elementAt(position);
 
-                            return Container(
-                              padding: EdgeInsets.all(4),
-                              margin: EdgeInsets.only(bottom: 10),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white.withOpacity(.3),width: 0.4),
-                                borderRadius: BorderRadius.circular(5)
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                return Container(
+                                  padding: EdgeInsets.all(4),
+                                  margin: EdgeInsets.only(bottom: 10),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.white.withOpacity(.3),width: 0.4),
+                                    borderRadius: BorderRadius.circular(5)
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      GestureDetector(
-                                        onTap: ()async{
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: ()async{
 
-                                          if((currentIndexSection +2) > position){
-                                          setState(() {
+                                if((currentIndexSection +2) > position){
+                                  if(value == position){
+                                    notifySectionOpen.value = -1;
+                                  }else{
+                                    notifySectionOpen.value = position;
+                                  }
+                                }
 
-                                            if(currentSectionIndexOpen == position){
-                                              currentSectionIndexOpen = -1;
-                                            }else{
-                                              currentSectionIndexOpen = position;
-                                            }
-                                          });
-                            }
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              width: 50,
-                                              height: 50,
-                                              margin: EdgeInsets.only(right: 10),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(50),
-                                                color: currentIndexSection+1 == position || currentIndexSection == position ? ColorPalete.defaultColor : ( position  <currentIndexSection ? ColorPalete.defaultColor:Colors.white),
+                                            },
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: 50,
+                                                  height: 50,
+                                                  margin: EdgeInsets.only(right: 10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(50),
+                                                    color: currentIndexSection+1 == position || currentIndexSection == position ? ColorPalete.defaultColor : ( position  <currentIndexSection ? ColorPalete.defaultColor:Colors.white),
 
-                                              ),
-                                              child: currentIndexSection+1 == position|| currentIndexSection == position ?  Icon(Icons.done, color: currentIndexSection==position?  Colors.white : ColorPalete.colorBlack,) : (position  <currentIndexSection ? Icon(Icons.done, color: Colors.white,) :Icon(Icons.lock, color: ColorPalete.colorBlack,)),
+                                                  ),
+                                                  child: currentIndexSection+1 == position|| currentIndexSection == position ?  Icon(Icons.done, color: currentIndexSection==position?  Colors.white : ColorPalete.colorBlack,) : (position  <currentIndexSection ? Icon(Icons.done, color: Colors.white,) :Icon(Icons.lock, color: ColorPalete.colorBlack,)),
+                                                ),
+                                                Text((position+1).toString()+" | ${model.title}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                                              ],
                                             ),
-                                            Text((position+1).toString()+" | ${model.title}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
-                                          ],
-                                        ),
+                                          ),
+
+                                          IconButton(onPressed: (){
+
+                                            if((currentIndexSection +2) > position){
+                                              if(value == position){
+                                                notifySectionOpen.value = -1;
+                                              }else{
+                                                notifySectionOpen.value = position;
+                                              }
+                                            }
+
+                                          }, icon: value==position? Icon(Icons.arrow_drop_up): Icon(Icons.arrow_drop_down, color: Colors.white,))
+
+                                        ],
                                       ),
+                                     value==position ?  Column(
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: model.contents.map((row) {
+                                          return Container(
+                                            margin: EdgeInsets.only(left: 4.8.w),
+                                            padding: EdgeInsets.only(top: 15,bottom: 15),
+                                            child: Row(
+                                              children: [
+                                                IconButton(
+                                                    style: IconButton.styleFrom(
+                                                        backgroundColor: Colors.orange
+                                                    ),
+                                                    onPressed: (){
 
-                                      IconButton(onPressed: (){
+                                                      if(currentIndexPlayer == model.contents.indexOf(row)){
+                                                        setState(() {
+                                                          currentIndexPlayer = -1;
+                                                          urlCurrentPlayer = "";
+                                                        });
+
+                                                      }else{
+                                                        setState(() {
+
+                                                          updateCurrentPlayerInDB(snapshot.requireData.idLibraryUser, snapshot.requireData.sections.elementAt(position).contents.elementAt(model.contents.indexOf(row)).idLibrarySectionContent);
 
 
-                                        setState(() {
+                                                          currentIndexSection = position;
+                                                          currentIndexPlayer = model.contents.indexOf(row);
+                                                          urlCurrentPlayer = row.videoURL;
 
-                                          if(currentSectionIndexOpen == position){
-                                            currentSectionIndexOpen = -1;
-                                          }else{
-                                            currentSectionIndexOpen = position;
-                                          }
-                                        });
+                                                        });
+                                                      }
 
 
 
-                                      }, icon: currentSectionIndexOpen==position? Icon(Icons.arrow_drop_up): Icon(Icons.arrow_drop_down, color: Colors.white,))
 
+
+                                                    }, icon: position==currentIndexSection && model.contents.indexOf(row)==currentIndexPlayer? Icon(Icons.pause, color: Colors.white,): Icon(Icons.play_arrow, color: ColorPalete.colorBlack,)),
+                                                SizedBox(width: 15,),
+                                                Text(row.title,style: TextStyle(color: Colors.white),),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList()
+                                      ) : Container(),
                                     ],
                                   ),
-                                 currentSectionIndexOpen==position ?  Column(
-                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: model.contents.map((row) {
-                                      return Container(
-                                        margin: EdgeInsets.only(left: 4.8.w),
-                                        padding: EdgeInsets.only(top: 15,bottom: 15),
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                                style: IconButton.styleFrom(
-                                                    backgroundColor: Colors.orange
-                                                ),
-                                                onPressed: (){
-
-                                                  if(currentIndexPlayer == model.contents.indexOf(row)){
-                                                    setState(() {
-                                                      currentIndexPlayer = -1;
-                                                      urlCurrentPlayer = "";
-                                                    });
-
-                                                  }else{
-                                                    setState(() {
-
-                                                      updateCurrentPlayerInDB(snapshot.requireData.idLibraryUser, snapshot.requireData.sections.elementAt(position).contents.elementAt(model.contents.indexOf(row)).idLibrarySectionContent);
-
-
-                                                      currentIndexSection = position;
-                                                      currentIndexPlayer = model.contents.indexOf(row);
-                                                      urlCurrentPlayer = row.videoURL;
-
-                                                    });
-                                                  }
-
-
-
-
-
-                                                }, icon: position==currentIndexSection && model.contents.indexOf(row)==currentIndexPlayer? Icon(Icons.pause, color: Colors.white,): Icon(Icons.play_arrow, color: ColorPalete.colorBlack,)),
-                                            SizedBox(width: 15,),
-                                            Text(row.title,style: TextStyle(color: Colors.white),),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList()
-                                  ) : Container(),
-                                ],
-                              ),
+                                );
+                              },
                             );
-                          },
+                          }
                         ),
                       )
 
